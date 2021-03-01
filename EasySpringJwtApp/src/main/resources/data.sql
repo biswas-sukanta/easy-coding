@@ -1,0 +1,2 @@
+insert into Student(student_id, student_name, student_dept, username, password) values(1001, 'Sukanta Biswas', 'CSE', 'sukanta', 'sukanta123');
+insert into Student(student_id, student_name, student_dept, username, password) values(2001, 'Somnath Biswas', 'CHE', 'somnath', 'somnath123');
