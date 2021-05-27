@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.covid19.vaccine.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
