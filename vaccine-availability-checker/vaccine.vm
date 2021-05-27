@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title>Vaccine Availibility Checker</title>
+        <style>
+            body {
+                background-color: powderblue;
+            }
+
+            h1 {
+                color: blue;
+            }
+
+            p {
+                color: red;
+            }
+
+            table.gridtable {
+                font-family: verdana,arial,sans-serif;
+                font-size: 11px;
+                color: #333333;
+                border-width: 1px;
+                border-color: #666666;
+                border-collapse: collapse;
+            }
+
+            table.gridtable th {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #666666;
+                background-color: #dedede;
+            }
+
+            table.gridtable td {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #666666;
+                background-color: #ffffff;
+            }
+        </style>
+
+    </head>
+    <body>
+        <center>
+            <h1>Today's Vaccine Availibility Report</h1>
+            <br/>
+            <h2>$emailDatas.size() Centers found!</h2>
+            <br/>
+            <h3>Please book your vaccine at the earliest from below centers/slots.<h3>
+            <br/>
+            #set( $count = 1 )
+            <TABLE class="gridtable">
+                <tr>
+                    <th>Serial #</th>
+                    <th>Center Name</th>
+                    <th>Address</th>
+                    <th>Fee Type</th>
+                    <th>Vaccine</th>
+                    <th>Slots</th>
+                    <th>Capacity</th>
+                </tr>
+                #foreach( $data in $emailDatas )
+                    <TR>
+                        <td>$count</td>
+                        <td>$data.getName()</td>
+                        <td>$data.getBlockName(), $data.getDistrictName(), $data.getStateName() - $data.getPincode()</td>
+                        <td>$data.getFeeType()</td>
+                        <td>$data.getVaccine()</td>
+                        <td>$data.getSlots()</td>
+                        <td>$data.getAvailableCapacity()</td>
+                    </tr>
+                    #set( $count = $count + 1 )
+                #end
+            </table>
+            <br/>
+        </center>
+
+    </body>
+</html>
