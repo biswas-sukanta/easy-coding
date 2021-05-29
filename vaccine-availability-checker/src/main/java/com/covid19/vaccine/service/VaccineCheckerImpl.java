@@ -11,6 +11,8 @@ import java.util.List;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +88,10 @@ public class VaccineCheckerImpl implements VaccineChecker {
 			if (!emailDatas.isEmpty()) {
 
 				final VelocityEngine velocityEngine = new VelocityEngine();
+				velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+				velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 				velocityEngine.init();
+				log.info("template path : {}", emailTemplate);			
 				final Template t = velocityEngine.getTemplate(emailTemplate);
 				final VelocityContext context = new VelocityContext();
 				context.put("emailDatas", emailDatas);
