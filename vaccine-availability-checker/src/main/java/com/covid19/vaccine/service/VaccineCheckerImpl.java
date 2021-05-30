@@ -4,9 +4,13 @@
 package com.covid19.vaccine.service;
 
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -25,9 +29,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.covid19.vaccine.entity.VaccineEntity;
 import com.covid19.vaccine.model.EmailData;
 import com.covid19.vaccine.model.Response;
 import com.covid19.vaccine.model.VaccineRequest;
+import com.covid19.vaccine.repository.VaccineRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class VaccineCheckerImpl implements VaccineChecker {
+public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 
 	@Value("${apisetu.endpoint.findByPin}")
 	private String findByPinUrl;
@@ -55,10 +61,15 @@ public class VaccineCheckerImpl implements VaccineChecker {
 	@Value("${vaccine.mail.template}")
 	private String emailTemplate;
 
+	@Autowired
+	private VaccineRepository repository;
+
 	@Override
 	public void checkAvailability(VaccineRequest vaccineRequest) {
-		final String url = findByPinUrl.replace("#pin#", vaccineRequest.getPinCode()).replace("#date#",
-				vaccineRequest.getDate());
+
+		final String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDate.now());
+		final String url = findByPinUrl.replace("#pin#", String.valueOf(vaccineRequest.getPincode())).replace("#date#",
+				today);
 
 		log.info("API-SETU-URL - {}", url);
 
@@ -91,7 +102,7 @@ public class VaccineCheckerImpl implements VaccineChecker {
 				velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 				velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 				velocityEngine.init();
-				log.info("template path : {}", emailTemplate);			
+				log.info("template path : {}", emailTemplate);
 				final Template t = velocityEngine.getTemplate(emailTemplate);
 				final VelocityContext context = new VelocityContext();
 				context.put("emailDatas", emailDatas);
@@ -103,6 +114,26 @@ public class VaccineCheckerImpl implements VaccineChecker {
 			}
 		}
 
+	}
+
+	@Override
+	public List<VaccineRequest> getAllVaccineRecords() {
+		final List<VaccineRequest> records = repository.findAll().stream()
+				.map(record -> modelMapper.map(record, VaccineRequest.class)).collect(Collectors.toList());
+		return records.isEmpty() ? Collections.emptyList() : records;
+	}
+
+	@Override
+	public VaccineEntity registerUser(VaccineRequest record) {
+		if (!repository
+				.findByEmailIdAndMobileNoAndPincode(record.getEmailId(), record.getMobileNo(), record.getPincode())
+				.isEmpty()) {
+			return null;
+		}
+		final String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDate.now());
+		record.setRegDate(today);
+		record.setActive(true);
+		return repository.save(modelMapper.map(record, VaccineEntity.class));
 	}
 
 }

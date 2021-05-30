@@ -11,10 +11,13 @@ import lombok.Data;
  */
 @Data
 public class VaccineRequest {
-	
-	private String name;
+
+	private String firstName;
+	private String lastName;
 	private String emailId;
 	private String mobileNo;
-	private String pinCode;
-	private String date;
+	private String pincode;
+	private String regDate;
+	public boolean isActive;
+	private ResponseStatus response;
 }

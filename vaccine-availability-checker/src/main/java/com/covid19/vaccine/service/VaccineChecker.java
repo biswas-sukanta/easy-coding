@@ -3,13 +3,19 @@
  */
 package com.covid19.vaccine.service;
 
-import com.covid19.vaccine.model.VaccineRequest;
+import java.util.List;
+
+import com.covid19.vaccine.entity.VaccineEntity;
 
 /**
  * @author Sukanta Biswas
  *
  */
-public interface VaccineChecker {
+public interface VaccineChecker<T> {
 
-	void checkAvailability(VaccineRequest vaccineRequest);
+	void checkAvailability(T vaccineRequest);
+
+	VaccineEntity registerUser(T record);
+
+	List<T> getAllVaccineRecords();
 }
