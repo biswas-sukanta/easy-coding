@@ -13,7 +13,7 @@ import com.covid19.vaccine.entity.VaccineEntity;
  */
 public interface VaccineChecker<T> {
 
-	void checkAvailability(T vaccineRequest);
+	void checkAvailability(T vaccineRequestm, String day);
 
 	VaccineEntity registerUser(T record);
 

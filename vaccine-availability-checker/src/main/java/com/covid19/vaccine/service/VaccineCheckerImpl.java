@@ -46,9 +46,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 
-	@Value("${apisetu.endpoint.findByPin}")
-	private String findByPinUrl;
-
+	@Autowired
+	private VaccineRepository repository;
+	
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -61,15 +61,16 @@ public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 	@Value("${vaccine.mail.template}")
 	private String emailTemplate;
 
-	@Autowired
-	private VaccineRepository repository;
+	@Value("${apisetu.endpoint.findByPin}")
+	private String findByPinUrl;
+	
+	@Value("${spring.mail.mainSub}")
+	private String mailMainSub;
 
 	@Override
-	public void checkAvailability(VaccineRequest vaccineRequest) {
+	public void checkAvailability(VaccineRequest vaccineRequest, String day) {
 
-		final String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDate.now());
-		final String url = findByPinUrl.replace("#pin#", String.valueOf(vaccineRequest.getPincode())).replace("#date#",
-				today);
+		final String url = findByPinUrl.replace("#pin#", String.valueOf(vaccineRequest.getPincode())).replace("#date#", day);
 
 		log.info("API-SETU-URL - {}", url);
 
@@ -93,7 +94,9 @@ public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 			final List<EmailData> emailDatas = new ArrayList<>();
 			responseObj.getBody().getSessions().forEach(session -> {
 				final EmailData emailData = modelMapper.map(session, EmailData.class);
-				emailDatas.add(emailData);
+				if (emailData.getAvailableCapacity() > 0) {
+					emailDatas.add(emailData);
+				}
 			});
 
 			if (!emailDatas.isEmpty()) {
@@ -109,11 +112,9 @@ public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 
 				final StringWriter writer = new StringWriter();
 				t.merge(context, writer);
-
-				mailService.sendMail(vaccineRequest.getEmailId(), writer.toString());
+				mailService.sendMail(vaccineRequest.getEmailId(), writer.toString(), mailMainSub);
 			}
 		}
-
 	}
 
 	@Override
@@ -130,10 +131,11 @@ public class VaccineCheckerImpl implements VaccineChecker<VaccineRequest> {
 				.isEmpty()) {
 			return null;
 		}
+		final VaccineEntity vaccineEntity = modelMapper.map(record, VaccineEntity.class);
 		final String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDate.now());
-		record.setRegDate(today);
-		record.setActive(true);
-		return repository.save(modelMapper.map(record, VaccineEntity.class));
+		vaccineEntity.setRegDate(today);
+		vaccineEntity.setActive(true);
+		return repository.save(vaccineEntity);
 	}
 
 }

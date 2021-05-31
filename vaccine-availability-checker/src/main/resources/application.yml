@@ -1,0 +1,44 @@
+apisetu:
+  endpoint:
+    findByPin: https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=#pin#&date=#date#
+cron:
+#  expression: 1 * * ? * *
+  expression: 0 0 9 ? * *
+server:
+  port: 5000
+spring:
+  datasource:
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      max_allowed_packet: 2000
+    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    username: youremail@gmail.com
+    password: password
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          port: 25
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+    mainSub: Vaccine Availibility
+    regSub: Registration Sucessful
+swagger:
+  utl: http://localhost:8080/swagger-ui/
+vaccine:
+  mail:
+    template: templates/vaccine.vm
+    frequency: 7

@@ -43,7 +43,7 @@
     </head>
     <body>
         <center>
-            <h1>Today's Vaccine Availibility Report</h1>
+            <h1>Vaccine Availibility Report</h1>
             <br/>
             <h2>$emailDatas.size() Centers found!</h2>
             <br/>
@@ -57,8 +57,12 @@
                     <th>Address</th>
                     <th>Fee Type</th>
                     <th>Vaccine</th>
-                    <th>Slots</th>
+                    <th>Min Age Limit</th>
+                    <th>Date</th>
                     <th>Capacity</th>
+                    <th>Slots</th>
+
+                    
                 </tr>
                 #foreach( $data in $emailDatas )
                     <TR>
@@ -67,8 +71,10 @@
                         <td>$data.getBlockName(), $data.getDistrictName(), $data.getStateName() - $data.getPincode()</td>
                         <td>$data.getFeeType()</td>
                         <td>$data.getVaccine()</td>
-                        <td>$data.getSlots()</td>
+                        <td>$data.getMinAgeLimit()</td>
+                        <td>$data.getDate()</td>
                         <td>$data.getAvailableCapacity()</td>
+                        <td>$data.getSlots()</td>
                     </tr>
                     #set( $count = $count + 1 )
                 #end

@@ -29,9 +29,6 @@ public class MailService {
 	@Value("${spring.mail.port}")
 	private Integer mailServerPort;
 
-	@Value("${spring.mail.sub}")
-	private String mailSubject;
-
 	@Value("${spring.mail.username}")
 	private String mailServerUsername;
 
@@ -52,7 +49,7 @@ public class MailService {
 	private MailService() {
 	}
 
-	public void sendMail(final String to, final String body) {
+	public void sendMail(final String to, final String body, final String subject) {
 		@SuppressWarnings("unchecked")
 		final RetryPolicy retryPolicy = new RetryPolicy().withBackoff(2, 3, TimeUnit.MINUTES)
 				.retryOn(EmailException.class).withMaxRetries(3);
@@ -60,7 +57,7 @@ public class MailService {
 		Failsafe.with(retryPolicy)
 				.onRetry(r -> log.warn("Mail Send failed.. Retrying once again.. Error :: {}", r.getMessage()))
 				.onFailure(e -> log.error("Error while sending mail :: {}", e.getMessage()))
-				.run(() -> sendMailWithRetry(to, body));
+				.run(() -> sendMailWithRetry(to, body, subject));
 	}
 
 	/*
@@ -89,7 +86,7 @@ public class MailService {
 		mailSession = Session.getDefaultInstance(emailProperties, null);
 	}
 
-	private MimeMessage draftEmailMessage(final String to, final String body)
+	private MimeMessage draftEmailMessage(final String to, final String body, final String subject)
 			throws MessagingException, UnsupportedEncodingException {
 		final String[] toEmails = { to };
 		final MimeMessage emailMessage = new MimeMessage(mailSession);
@@ -97,17 +94,17 @@ public class MailService {
 			emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
 		}
 		emailMessage.setFrom(new InternetAddress("admin@vaccine-checker.com", "Vaccine Checker App"));
-		emailMessage.setSubject(mailSubject);
+		emailMessage.setSubject(subject);
 		emailMessage.setContent(body, "text/html");
 		return emailMessage;
 	}
 
-	private void sendMailWithRetry(final String to, final String body) throws MessagingException {
+	private void sendMailWithRetry(final String to, final String body, final String mailSubject) throws MessagingException {
 		setMailServerProperties();
 		try {
 			final Transport transport = mailSession.getTransport(transportPtotocol);
 			transport.connect(mailServerHost, mailServerUsername, mailServerPassword);
-			final MimeMessage emailMessage = draftEmailMessage(to, body);
+			final MimeMessage emailMessage = draftEmailMessage(to, body, mailSubject);
 			transport.sendMessage(emailMessage, emailMessage.getAllRecipients());
 			transport.close();
 			log.info("Email sent successfully.");
