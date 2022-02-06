@@ -104,7 +104,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
 	<modules>
 		<module>student-service</module>
 		<module>address-service</module>
