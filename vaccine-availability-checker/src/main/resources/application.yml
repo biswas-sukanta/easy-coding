@@ -1,15 +1,17 @@
 apisetu:
   endpoint:
     findByPin: https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=#pin#&date=#date#
+    findByPinMulti: https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=#pin#&date=#date#
 cron:
-#  expression: 1 * * ? * *
-  expression: 0 0 9 ? * *
+  expression: 0 0,30 7-23 ? * *
+  
 server:
   port: 5000
 spring:
   datasource:
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
+#    url: jdbc:postgresql://postgres.c6uec03u1bpm.ap-south-1.rds.amazonaws.com:5432/postgres
     username: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -21,8 +23,8 @@ spring:
     show-sql: true
   mail:
     host: smtp.gmail.com
-    username: youremail@gmail.com
-    password: password
+    username: vacslot.alert@gmail.com
+    password: Vacslot@123
     port: 587
     properties:
       mail:
@@ -34,11 +36,17 @@ spring:
             required: true
         transport:
           protocol: smtp
-    mainSub: Vaccine Availibility
-    regSub: Registration Sucessful
-swagger:
-  utl: http://localhost:8080/swagger-ui/
+    mainSub: "Vaccine slots is available on #date#"
+    multiMailSub: "Vaccine slots are available at your pincode : #pin#"
+    regSub: Registration is successful
+#swagger:
+#  utl: http://localhost:8080/swagger-ui/
 vaccine:
   mail:
-    template: templates/vaccine.vm
+    notification: templates/vaccine.vm
+    registration: templates/registration.vm
     frequency: 7
+app:
+   api:
+      password: V@c$l0t_P@$$word
+      sevenDaysAvailabilityOn: true   

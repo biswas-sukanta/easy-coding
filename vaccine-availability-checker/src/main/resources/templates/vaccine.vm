@@ -1,11 +1,10 @@
 ## <html>
     <head>
-        <title>Vaccine Availibility Checker</title>
+        <title>Vaccine Availability Checker</title>
         <style>
             body {
                 background-color: powderblue;
             }
-
             h1 {
                 color: blue;
             }
@@ -43,11 +42,13 @@
     </head>
     <body>
         <center>
-            <h1>Vaccine Availibility Report</h1>
+            <h1>Vaccine Availability Report</h1>
             <br/>
             <h2>$emailDatas.size() Centers found!</h2>
             <br/>
-            <h3>Please book your vaccine at the earliest from below centers/slots.<h3>
+            <h3>Requesting you to follow this facebook page to get regular updates :  <a href="https://www.facebook.com/VaccineChecker">www.facebook.com/VaccineChecker</a><h3>
+            <br/>
+            <h5>Register here and book your vaccine at the earliest from below centers/slots : <a href="https://selfregistration.cowin.gov.in">https://selfregistration.cowin.gov.in</a><h4>
             <br/>
             #set( $count = 1 )
             <TABLE class="gridtable">
@@ -59,10 +60,10 @@
                     <th>Vaccine</th>
                     <th>Min Age Limit</th>
                     <th>Date</th>
-                    <th>Capacity</th>
+                    <th>Total Capacity</th>
+                    <th>1st Dosage Capacity</th>
+                    <th>2nd Dosage Capacity</th>
                     <th>Slots</th>
-
-                    
                 </tr>
                 #foreach( $data in $emailDatas )
                     <TR>
@@ -74,13 +75,17 @@
                         <td>$data.getMinAgeLimit()</td>
                         <td>$data.getDate()</td>
                         <td>$data.getAvailableCapacity()</td>
+                        <td>$data.getFirstDosageCapacity()</td>
+                        <td>$data.getSecondDosageCapacity()</td>
                         <td>$data.getSlots()</td>
                     </tr>
                     #set( $count = $count + 1 )
                 #end
             </table>
             <br/>
+            <br/>
         </center>
-
+         <h5>**Please drop by your suggestion/feedback at <a href="mailto:support@vaccinechecker.online">support@vaccinechecker.online</a>. To unsubscribe from this application, Please fill this form -<a href="https://forms.gle/ZRqXPeRDAV8vohkT6">https://forms.gle/ZRqXPeRDAV8vohkT6</a></h5>
+         <br/>
     </body>
 ## </html>

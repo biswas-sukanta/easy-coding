@@ -38,16 +38,11 @@ public class EmailData {
 	public String date;
 	@JsonProperty("available_capacity")
 	public int availableCapacity;
-	@JsonProperty("available_capacity_dose1")
-	public int firstDosageCapacity;
-	@JsonProperty("available_capacity_dose2")
-	public int secondDosageCapacity;
 	@JsonProperty("min_age_limit")
 	public int minAgeLimit;
 	@JsonProperty("vaccine")
 	public String vaccine;
 	@JsonProperty("slots")
 	public List<String> slots = null;
-	
 
 }

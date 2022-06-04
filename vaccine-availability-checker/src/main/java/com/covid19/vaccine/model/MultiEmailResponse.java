@@ -5,6 +5,8 @@ package com.covid19.vaccine.model;
 
 import java.util.List;
 
+import com.covid19.vaccine.service.model.Session;
+import com.covid19.vaccine.service.model.VaccineFee;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -14,12 +16,14 @@ import lombok.Data;
  *
  */
 @Data
-public class EmailData {
+public class MultiEmailResponse {
 
 	@JsonProperty("center_id")
-	public int centerId;
+	public Integer centerId;
 	@JsonProperty("name")
 	public String name;
+	@JsonProperty("address")
+	public String address;
 	@JsonProperty("state_name")
 	public String stateName;
 	@JsonProperty("district_name")
@@ -27,27 +31,19 @@ public class EmailData {
 	@JsonProperty("block_name")
 	public String blockName;
 	@JsonProperty("pincode")
-	public int pincode;
+	public Integer pincode;
+	@JsonProperty("lat")
+	public Integer lat;
+	@JsonProperty("long")
+	public Integer _long;
 	@JsonProperty("from")
 	public String from;
 	@JsonProperty("to")
 	public String to;
 	@JsonProperty("fee_type")
 	public String feeType;
-	@JsonProperty("date")
-	public String date;
-	@JsonProperty("available_capacity")
-	public int availableCapacity;
-	@JsonProperty("available_capacity_dose1")
-	public int firstDosageCapacity;
-	@JsonProperty("available_capacity_dose2")
-	public int secondDosageCapacity;
-	@JsonProperty("min_age_limit")
-	public int minAgeLimit;
-	@JsonProperty("vaccine")
-	public String vaccine;
-	@JsonProperty("slots")
-	public List<String> slots = null;
-	
-
+	@JsonProperty("sessions")
+	public List<Session> sessions = null;
+	@JsonProperty("vaccine_fees")
+	public List<VaccineFee> vaccineFees = null;
 }

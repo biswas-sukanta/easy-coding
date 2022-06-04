@@ -25,7 +25,5 @@ public class VaccineRequest {
 	private String pincode;
 	private boolean isActive;
 	private String ageFilter;
-	private String feeType;
-	private String vaccineName;
 	private ResponseStatus response;
 }

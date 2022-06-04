@@ -1,10 +1,7 @@
 package com.covid19.vaccine.service;
 
 import java.io.UnsupportedEncodingException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
@@ -15,13 +12,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.mail.EmailException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
-import com.covid19.vaccine.entity.EmailFrequency;
-import com.covid19.vaccine.repository.EmailFrequencyRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
@@ -53,12 +45,6 @@ public class MailService {
 	private String transportPtotocol;
 
 	Session mailSession;
-	
-	@Autowired
-	EmailFrequencyRepository emailFrequencyRepository;
-	
-	@Autowired
-	private Environment env;
 
 	private MailService() {
 	}
@@ -73,6 +59,23 @@ public class MailService {
 				.onFailure(e -> log.error("Error while sending mail :: {}", e.getMessage()))
 				.run(() -> sendMailWithRetry(to, body, subject));
 	}
+
+	/*
+	 * public void sendMailWithRetry(final String to, final String body) throws
+	 * EmailException {
+	 * 
+	 * try { final Email email = new HtmlEmail(); log.info("Host and Port : {}  {}",
+	 * mailServerHost, mailServerPort); log.info("Username and Password : {}  {}",
+	 * mailServerUsername, mailServerPassword); email.setHostName(mailServerHost);
+	 * // email.setSmtpPort(465); email.setAuthenticator(new
+	 * DefaultAuthenticator(mailServerUsername, mailServerPassword));
+	 * email.setSSLOnConnect(true); email.setSSLCheckServerIdentity(true);
+	 * email.setSocketConnectionTimeout(2000); email.setDebug(true);
+	 * email.setFrom("admin@vaccine-help.com", "Vaccine Checker App" );
+	 * email.setSubject(mailSubject); email.setMsg(body); email.addTo(to);
+	 * email.send(); log.info("Email Sent Successfully"); } catch (EmailException e)
+	 * { log.error("Error while sending mail : {}", e); } }
+	 */
 
 	private void setMailServerProperties() {
 		final Properties emailProperties = System.getProperties();
@@ -90,56 +93,23 @@ public class MailService {
 		for (final String toEmail : toEmails) {
 			emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
 		}
-		emailMessage.setFrom(new InternetAddress("support@vaccinechecker.online", "VaccineChecker App"));
+		emailMessage.setFrom(new InternetAddress("admin@vaccine-checker.com", "Vaccine Checker App"));
 		emailMessage.setSubject(subject);
 		emailMessage.setContent(body, "text/html");
 		return emailMessage;
 	}
 
-	private void sendMailWithRetry(final String to, final String body, final String mailSubject) {
+	private void sendMailWithRetry(final String to, final String body, final String mailSubject) throws MessagingException {
 		setMailServerProperties();
-		CompletableFuture.runAsync(() -> {
-			try {
-				final MimeMessage emailMessage = draftEmailMessage(to, body, mailSubject);
-				final Transport transport = mailSession.getTransport(transportPtotocol);
-				sendingMail(transport, emailMessage);
-			} catch (MessagingException | UnsupportedEncodingException e) {
-				log.error("Error while sending mail. {}", e);
-			}
-		});
-	}
-
-	/**
-	 * @param transport
-	 * @param emailMessage
-	 * @throws MessagingException
-	 */
-	private void sendingMail(final Transport transport, final MimeMessage emailMessage) throws MessagingException {
 		try {
-			
-			int hour = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).getHour();
-			log.info("Current Hour : {}", hour);
-
-			EmailFrequency emailRecord = emailFrequencyRepository.findByHour(hour);
-			
-			if (null != emailRecord) {
-				mailServerUsername = emailRecord.getEmailId();
-				mailServerPassword = emailRecord.getPassword();
-				log.info("Current Hour from DB, Email ID : {} Hour : {} ", emailRecord.getHour(), hour);
-			}
-			
+			final Transport transport = mailSession.getTransport(transportPtotocol);
 			transport.connect(mailServerHost, mailServerUsername, mailServerPassword);
+			final MimeMessage emailMessage = draftEmailMessage(to, body, mailSubject);
 			transport.sendMessage(emailMessage, emailMessage.getAllRecipients());
-			log.info("Email sent successfully.");
-		} catch (Exception e) {
-			String username = env.getProperty("spring.mail.username");
-			String password = env.getProperty("spring.mail.password");
-			log.error("Error while sending mail. Now routing via alternate emailId {}, Exception : {}", username, e);
-			transport.connect(mailServerHost, username, password);
-			transport.sendMessage(emailMessage, emailMessage.getAllRecipients());
-			log.info("Email sent successfully via alternate way");
-		} finally {
 			transport.close();
+			log.info("Email sent successfully.");
+		} catch (final MessagingException | UnsupportedEncodingException e) {
+			log.error("Error while sending mail : {}", e);
 		}
 	}
 

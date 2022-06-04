@@ -14,5 +14,5 @@ import com.covid19.vaccine.entity.VaccineEntity;
  *
  */
 public interface VaccineRepository extends JpaRepository<VaccineEntity, Long> {
-	List<VaccineEntity> findByEmailIdAndMobileNoAndPincodeAndAgeFilterAndIsActive(String emailId, String mobileNo, String pincode, String ageFilter, boolean isActive);
+	List<VaccineEntity> findByEmailIdAndMobileNoAndPincode(String emailId, String mobileNo, String pincode);
 }

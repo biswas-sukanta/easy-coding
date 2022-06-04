@@ -45,14 +45,5 @@ public class VaccineEntity {
 
 	@Column(name = "is_active", nullable = false)
 	public boolean isActive;
-	
-	@Column(name = "age_filter", updatable = true)
-	public String ageFilter;
-	
-	@Column(name = "fee_type", updatable = true)
-	public String feeType;
-	
-	@Column(name = "vaccine_name", updatable = true)
-	public String vaccineName;
 
 }
